@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>സി. എച്ച്. മുഹമ്മദ് കോയ - ക്വിസ് മത്സരം</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Manjari', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden p-6 sm:p-8 transition-all duration-300">
+        
+        <!-- Header / Progress Section -->
+        <div id="quiz-header" class="mb-6">
+            <div class="flex justify-between items-center mb-2">
+                <span id="question-counter" class="text-sm font-semibold text-gray-500">ചോദ്യം 1 / 5</span>
+                <span id="score-tracker" class="text-sm font-semibold text-indigo-600">സ്കോർ: 0</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 20%"></div>
+            </div>
+        </div>
+
+        <!-- Question Section -->
+        <div id="question-container" class="mb-6">
+            <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-gray-800 mb-6 leading-relaxed"></h2>
+            <div id="options-container" class="space-y-3">
+                <!-- Options will be dynamically injected here -->
+            </div>
+        </div>
+
+        <!-- Summary View (Hidden by default) -->
+        <div id="summary-container" class="hidden">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full text-3xl font-bold mb-4 shadow-inner">🏆</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">ക്വിസ് പൂർത്തിയായി!</h2>
+                <p id="final-score-text" class="text-lg text-gray-600 mb-6"></p>
+                <button onclick="restartQuiz()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    വീണ്ടും ശ്രമിക്കുക
+                </button>
+            </div>
+            
+            <div class="border-t border-gray-200 pt-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">വിശദമായ റിപ്പോർട്ട്</h3>
+                <div id="report-list" class="space-y-4">
+                    <!-- Detailed report injected here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "സി. എച്ച്. മുഹമ്മദ് കോയ കേരളത്തിന്റെ മുഖ്യമന്ത്രിയായ വർഷം ഏതാണ്?",
+                options: ["1977", "1979", "1981", "1982"],
+                answer: "1979"
+            },
+            {
+                question: "ഏറ്റവും കുറഞ്ഞ കാലയളവ് കേരള മുഖ്യമന്ത്രിയായിരുന്ന വ്യക്തി ആരാണ്?",
+                options: ["സി. എച്ച്. മുഹമ്മദ് കോയ", "പി. കെ. വാസുദേവൻ നായർ", "പട്ടം താണുപിള്ള", "ആർ. ശങ്കർ"],
+                answer: "സി. എച്ച്. മുഹമ്മദ് കോയ"
+            },
+            {
+                question: "സി. എച്ച്. മുഹമ്മദ് കോയ രചിച്ച പ്രശസ്തമായ യാത്രാവിവരണം ഏതാണ്?",
+                options: ["എന്റെ വിദേശ യാത്രകൾ", "ലണ്ടൻ ഡയറി", "ഗൾഫ് നാടുകളിൽ", "മലേഷ്യൻ ഡയറിയിൽ"],
+                answer: "ലണ്ടൻ ഡയറി"
+            },
+            {
+                question: "കോഴിക്കോട് സർവകലാശാല സ്ഥാപിക്കുന്നതിൽ പ്രധാന പങ്കുവഹിച്ച അന്നത്തെ വിദ്യാഭ്യാസ മന്ത്രി ആരായിരുന്നു?",
+                options: ["ജോസഫ് മുണ്ടശ്ശേരി", "സി. എച്ച്. മുഹമ്മദ് കോയ", "കെ. കരുണാകരൻ", "ടി. എം. ജേക്കബ്"],
+                answer: "സി. എച്ച്. മുഹമ്മദ് കോയ"
+            },
+            {
+                question: "സി. എച്ച്. മുഹമ്മദ് കോയ ഏത് പ്രമുഖ പത്രത്തിന്റെ ചീഫ് എഡിറ്റർ ആയിരുന്നു?",
+                options: ["മാതൃഭൂമി", "ചന്ദ്രിക", "മലയാള മനോരമ", "മാധ്യമം"],
+                answer: "ചന്ദ്രിക"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+        let isAnswerLocked = false;
+
+        const questionCounterEl = document.getElementById('question-counter');
+        const scoreTrackerEl = document.getElementById('score-tracker');
+        const progressBarEl = document.getElementById('progress-bar');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainerEl = document.getElementById('options-container');
+        const quizHeaderEl = document.getElementById('quiz-header');
+        const questionContainerEl = document.getElementById('question-container');
+        const summaryContainerEl = document.getElementById('summary-container');
+        const finalScoreTextEl = document.getElementById('final-score-text');
+        const reportListEl = document.getElementById('report-list');
+
+        function loadQuestion() {
+            isAnswerLocked = false;
+            const currentQ = quizData[currentQuestionIndex];
+            
+            questionCounterEl.innerText = `ചോദ്യം ${currentQuestionIndex + 1} / ${quizData.length}`;
+            scoreTrackerEl.innerText = `സ്കോർ: ${score}`;
+            progressBarEl.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+            
+            questionTextEl.innerText = currentQ.question;
+            optionsContainerEl.innerHTML = '';
+
+            currentQ.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'w-full text-right p-4 rounded-xl border-2 border-gray-200 hover:border-indigo-500 hover:bg-indigo-50 text-gray-700 font-medium transition-all duration-200 focus:outline-none flex justify-between items-center';
+                button.innerHTML = `<span>${option}</span><span class="text-sm text-gray-400">ഒപ്ഷൻ ${index + 1}</span>`;
+                button.onclick = () => selectOption(option, button);
+                optionsContainerEl.appendChild(button);
+            });
+        }
+
+        function selectOption(selectedOption, selectedButton) {
+            if (isAnswerLocked) return;
+            isAnswerLocked = true;
+
+            const currentQ = quizData[currentQuestionIndex];
+            const isCorrect = selectedOption === currentQ.answer;
+
+            userAnswers.push({
+                question: currentQ.question,
+                selected: selectedOption,
+                correct: currentQ.answer,
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
+                score++;
+                scoreTrackerEl.innerText = `സ്കോർ: ${score}`;
+                selectedButton.classList.remove('border-gray-200', 'hover:border-indigo-500', 'hover:bg-indigo-50');
+                selectedButton.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                selectedButton.querySelector('span:last-child').innerText = 'ശരിയാണ് ✓';
+                selectedButton.querySelector('span:last-child').className = 'text-sm font-bold text-green-600';
+            } else {
+                selectedButton.classList.remove('border-gray-200', 'hover:border-indigo-500', 'hover:bg-indigo-50');
+                selectedButton.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                selectedButton.querySelector('span:last-child').innerText = 'തെറ്റാണ് ✗';
+                selectedButton.querySelector('span:last-child').className = 'text-sm font-bold text-red-600';
+
+                // Highlight correct option
+                const optionButtons = optionsContainerEl.querySelectorAll('button');
+                optionButtons.forEach(btn => {
+                    if (btn.querySelector('span').innerText === currentQ.answer) {
+                        btn.classList.remove('border-gray-200', 'hover:border-indigo-500', 'hover:bg-indigo-50');
+                        btn.classList.add('bg-green-50', 'border-green-400', 'text-green-800');
+                        btn.querySelector('span:last-child').innerText = 'ശരിയായ ഉത്തരം ✓';
+                        btn.querySelector('span:last-child').className = 'text-sm font-bold text-green-600';
+                    }
+                });
+            }
+
+            // Disable all options
+            const allButtons = optionsContainerEl.querySelectorAll('button');
+            allButtons.forEach(btn => btn.disabled = true);
+
+            // Transition after 1.5 seconds
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showSummary();
+                }
+            }, 1500);
+        }
+
+        function showSummary() {
+            quizHeaderEl.classList.add('hidden');
+            questionContainerEl.classList.add('hidden');
+            summaryContainerEl.classList.remove('hidden');
+
+            finalScoreTextEl.innerText = `നിങ്ങൾ ${quizData.length}-ൽ ${score} മാർക്ക് നേടി!`;
+
+            reportListEl.innerHTML = '';
+            userAnswers.forEach((ans, idx) => {
+                const reportItem = document.createElement('div');
+                reportItem.className = `p-4 rounded-xl border ${ans.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`;
+                
+                let reportContent = `
+                    <p class="font-bold text-gray-800 mb-2">${idx + 1}. ${ans.question}</p>
+                    <p class="text-sm text-gray-700 mb-1">നിങ്ങളുടെ ഉത്തരം: <span class="font-semibold ${ans.isCorrect ? 'text-green-600' : 'text-red-600'}">${ans.selected}</span> ${ans.isCorrect ? '✓' : '✗'}</p>
+                `;
+
+                if (!ans.isCorrect) {
+                    reportContent += `<p class="text-sm text-gray-700">ശരിയായ ഉത്തരം: <span class="font-semibold text-green-600">${ans.correct}</span></p>`;
+                }
+
+                reportItem.innerHTML = reportContent;
+                reportListEl.appendChild(reportItem);
+            });
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            isAnswerLocked = false;
+            summaryContainerEl.classList.add('hidden');
+            quizHeaderEl.classList.remove('hidden');
+            questionContainerEl.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // Initialize quiz
+        loadQuestion();
+    </script>
+</body>
+</html>
